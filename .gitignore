@@ -32,6 +32,9 @@ MANIFEST
 *.manifest
 *.spec
 
+#reminder file 
+plan.txt
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
@@ -147,6 +150,7 @@ activemq-data/
 # SageMath parsed files
 *.sage.py
 
+
 # Environments
 .env
 .envrc
@@ -215,8 +219,4 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-#environment variables file
-.env
 
-#some reminder notes
-plan.txt

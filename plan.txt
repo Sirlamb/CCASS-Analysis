@@ -1,2 +1,0 @@
-searchbar for datagrid
-sort datagrid by amount 
