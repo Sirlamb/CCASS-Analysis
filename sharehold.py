@@ -11,7 +11,7 @@ from datetime import datetime, timedelta, timezone
 
 def validate_arg_code(code):
     if code.isdigit() and len(code) <= 5:
-        return code
+        return "{:05d}".format(int(code))
     else:
         print('Invalid Stock Code')
         raise ValueError('Invalid Stock Code')
@@ -32,7 +32,7 @@ def validate_arg_date(date):
         print('Invalid Shareholding Date')
         raise
 
-def searchsdw(today, txtShareholdingDate, txtstockCode):
+def searchsdw(today, txtShareholdingDate, txtStockCode):
     try:
 
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36', 'Content-Type': 'application/x-www-form-urlencoded'}
@@ -57,6 +57,67 @@ def searchsdw(today, txtShareholdingDate, txtstockCode):
     except:
         print("HKEX server issue. Please try again later")
         raise
+
+def merge_data(json_start, json_end):
+    data = []
+    for entry_json_start in json_start:
+        for entry_json_end in json_end:
+            if entry_json_start["id"] == entry_json_end["id"] and entry_json_start["name"] == entry_json_end["name"]:
+                entry_json_start["is_matched"], entry_json_end["is_matched"]  = 'Y', 'Y'
+                shareholding_start = int(entry_json_start["shareholding"].replace(',',''))
+                shareholding_end = int(entry_json_end["shareholding"].replace(',',''))
+                shareholding_change = shareholding_end - shareholding_start
+                shareholding_change_percent = shareholding_change / shareholding_start * 100
+
+                items = {}
+                items["id"] = entry_json_start["id"] 
+                items["name"] = entry_json_start["name"]
+                items["start"] = shareholding_start
+                items["start-display"] = entry_json_start["shareholding"] + ' (' + entry_json_start["shareholding-percent"] + ')'
+                items["end"] = shareholding_end
+                items["end-display"] = entry_json_end["shareholding"] + ' (' + entry_json_end["shareholding-percent"] + ')'
+                items["change"] = shareholding_change
+                items["change-percent"] = shareholding_change_percent
+                items["change-display"] = f"{shareholding_change:,}" + ' (' + f'{round(shareholding_change_percent,2):.2f}' + '%)'
+                data.append(items)
+
+    for entry_json_start in json_start:
+        if entry_json_start["is_matched"] == 'N':
+            shareholding_start = int(entry_json_start["shareholding"].replace(',',''))
+            shareholding_end = 0
+            shareholding_change = shareholding_end - shareholding_start
+            shareholding_change_percent = -100
+
+            items = {}
+            items["id"] = entry_json_start["id"] 
+            items["name"] = entry_json_start["name"]
+            items["start"] = shareholding_start
+            items["start-display"] = entry_json_start["shareholding"] + ' (' + entry_json_start["shareholding-percent"] + ')'
+            items["end"] = shareholding_end
+            items["end-display"] = '0 (0.00%)'
+            items["change"] = shareholding_change
+            items["change-percent"] = shareholding_change_percent
+            items["change-display"] = f"{shareholding_change:,}" + ' (-100.00%)'
+            data.append(items)
+
+    for entry_json_end in json_end:
+        if entry_json_end["is_matched"] == 'N':
+            shareholding_start = 0
+            shareholding_end = int(entry_json_end["shareholding"].replace(',',''))
+            shareholding_change = shareholding_end - shareholding_start
+            shareholding_change_percent = 100
+            items = {}
+            items["id"] = entry_json_end["id"] 
+            items["name"] = entry_json_end["name"] 
+            items["start"] = shareholding_start
+            items["start-display"] = '0 (0.00%)'
+            items["end"] = shareholding_end
+            items["end-display"] = entry_json_end["shareholding"] + ' (' + entry_json_end["shareholding-percent"] + ')'
+            items["change"] = shareholding_change
+            items["change-percent"] = shareholding_change_percent
+            items["change-display"] = f"{shareholding_change:,}" + ' (100.00%)'
+            data.append(items)
+    return data
 
 
 if __name__ == "__main__":

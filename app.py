@@ -37,11 +37,20 @@ def submit_search():
     stock = sharehold.validate_arg_code(stock)
     startDate = sharehold.validate_arg_date(startDate)
     endDate = sharehold.validate_arg_date(endDate)
-    
-    start_json = sharehold.searchsdw(today, startDate, stock)
-    end_json = sharehold.searched(today, endDate, stock)
 
-    return "here"
+    start_json = sharehold.searchsdw(today, startDate, stock)
+    end_json = sharehold.searchsdw(today, endDate, stock)
+
+    data = sharehold.merge_data(start_json, end_json)
+
+    print(data)
+    
+    return render_template("result.html", DATA=data)
+
+# @app.route("/search")
+# def query():
+#     q = request.args.get('q')
+#     return f"Search query: {q}"
 
 
 
