@@ -59,7 +59,11 @@ def searchsdw(today, txtShareholdingDate, txtStockCode):
         raise
 
 def merge_data(json_start, json_end):
+    
     data = []
+    table = [] 
+    index = [] 
+
     for entry_json_start in json_start:
         for entry_json_end in json_end:
             if entry_json_start["id"] == entry_json_end["id"] and entry_json_start["name"] == entry_json_end["name"]:
@@ -117,84 +121,8 @@ def merge_data(json_start, json_end):
             items["change-percent"] = shareholding_change_percent
             items["change-display"] = f"{shareholding_change:,}" + ' (100.00%)'
             data.append(items)
+
     return data
-
-
-if __name__ == "__main__":
-
-    today = format(datetime.now(timezone.utc) + timedelta(hours=8), '%Y%m%d')
-    code = '941' 
-    txtStockCode = "{:05d}".format(int(code))
-
-    txtShareholdingDateStart = urllib.parse.quote("2024/11/01", safe='')
-    txtShareholdingDateEnd = urllib.parse.quote("2025/01/02", safe='')
-
-    json_start = searchsdw(today, txtShareholdingDateStart, txtStockCode)
-    json_end = searchsdw(today, txtShareholdingDateEnd, txtStockCode)
-
-    # Megre JSONs
-    data = []
-    table = []
-    index = []
-    for entry_json_start in json_start:
-        for entry_json_end in json_end:
-            if entry_json_start["id"] == entry_json_end["id"] and entry_json_start["name"] == entry_json_end["name"]:
-                entry_json_start["is_matched"], entry_json_end["is_matched"]  = 'Y', 'Y'
-                shareholding_start = int(entry_json_start["shareholding"].replace(',',''))
-                shareholding_end = int(entry_json_end["shareholding"].replace(',',''))
-                shareholding_change = shareholding_end - shareholding_start
-                shareholding_change_percent = shareholding_change / shareholding_start * 100
-
-                items = {}
-                items["id"] = entry_json_start["id"] 
-                items["name"] = entry_json_start["name"]
-                items["start"] = shareholding_start
-                items["start-display"] = entry_json_start["shareholding"] + ' (' + entry_json_start["shareholding-percent"] + ')'
-                items["end"] = shareholding_end
-                items["end-display"] = entry_json_end["shareholding"] + ' (' + entry_json_end["shareholding-percent"] + ')'
-                items["change"] = shareholding_change
-                items["change-percent"] = shareholding_change_percent
-                items["change-display"] = f"{shareholding_change:,}" + ' (' + f'{round(shareholding_change_percent,2):.2f}' + '%)'
-                data.append(items)
-
-    for entry_json_start in json_start:
-        if entry_json_start["is_matched"] == 'N':
-            shareholding_start = int(entry_json_start["shareholding"].replace(',',''))
-            shareholding_end = 0
-            shareholding_change = shareholding_end - shareholding_start
-            shareholding_change_percent = -100
-
-            items = {}
-            items["id"] = entry_json_start["id"] 
-            items["name"] = entry_json_start["name"]
-            items["start"] = shareholding_start
-            items["start-display"] = entry_json_start["shareholding"] + ' (' + entry_json_start["shareholding-percent"] + ')'
-            items["end"] = shareholding_end
-            items["end-display"] = '0 (0.00%)'
-            items["change"] = shareholding_change
-            items["change-percent"] = shareholding_change_percent
-            items["change-display"] = f"{shareholding_change:,}" + ' (-100.00%)'
-            data.append(items)
-
-    for entry_json_end in json_end:
-        if entry_json_end["is_matched"] == 'N':
-            shareholding_start = 0
-            shareholding_end = int(entry_json_end["shareholding"].replace(',',''))
-            shareholding_change = shareholding_end - shareholding_start
-            shareholding_change_percent = 100
-            items = {}
-            items["id"] = entry_json_end["id"] 
-            items["name"] = entry_json_end["name"] 
-            items["start"] = shareholding_start
-            items["start-display"] = '0 (0.00%)'
-            items["end"] = shareholding_end
-            items["end-display"] = entry_json_end["shareholding"] + ' (' + entry_json_end["shareholding-percent"] + ')'
-            items["change"] = shareholding_change
-            items["change-percent"] = shareholding_change_percent
-            items["change-display"] = f"{shareholding_change:,}" + ' (100.00%)'
-            data.append(items)
-
-    print(data)
 
 
 

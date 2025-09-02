@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
     <html>
     <head>
         <title>CCASS json Table</title>
@@ -7,38 +7,29 @@
     </head>
 
     <body>
-        <section class="section">
-            <div class="= columns">
-                <div class="column is-half is-offset-one-quarter">
-                    <input class="input" type="text" placeholder="Search">
-                </div>
-                    <table class="table is-fullwidth ">
-                        <thead>
-                            <tr>
-                                <th>Participant ID</th>
-                                <th>Participant Name</th>
-                                <th>Shareholding (Start Date)</th>
-                                <th>Shareholding (End Date)</th>
-                                <th>Change in Shareholding</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in data %}
-                            <tr>
-                                <td>{{ item.id }}</td>
-                                <td>{{ item.name }}</td>
-                                <td>{{ item.start }}</td>
-                                <td>{{ item.end }}</td>
-                                <td>{{ item.change-percent }}%</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+        <table>
+            <tr>
+                {% for header in headings  %}
+                    <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
 
-            </div>
+        <tbody>
+            {% for item in data %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.start }}</td>
+                <td>{{ item.start-display }}</td>
+                <td>{{ item.end }}</td>
+                <td>{{ item.end-display }}</td>
+                <td>{{ item.change }}</td>
+                <td>{{ item.change-percent }}%</td>
+                <td>{{ item.change-display }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>       
+    </table>
 
-
-
-        </section>
     </body>
-    </html>
+</html>

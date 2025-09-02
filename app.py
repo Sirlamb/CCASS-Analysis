@@ -1,13 +1,20 @@
-from flask import Flask, send_file
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import json
 import sharehold
 from datetime import datetime, timedelta, timezone
 import re
+from flask_cors import CORS  # Import CORS
 
 today = format(datetime.now(timezone.utc) + timedelta(hours=8), '%Y%m%d')
 
 app = Flask(__name__, template_folder='template')
+CORS(app)  # Enable CORS for all routes
+
+headings = ("id", "name", "start", "start-display", "end", "end-display", "change", "change-percent", "change-display")
+# mydata = (
+#     ("001", "ABC Company", "1000", "1,000", "1200", "1,200", "200", "20%", "+200 (+20%)"),
+#     ("002", "XYZ Corporation", "500", "500", "450", "450", "-50", "-10%", "-50 (-10%)")    
+# )
 
 @app.route("/")
 def searchbar():
@@ -19,7 +26,7 @@ def searchbar():
     return render_template("index.html")
 
 
-@app.route("/search", methods=['POST'])
+@app.route('/search', methods=['POST'])
 def submit_search():
     """
     Performs the search and displays the results in the webpage.
@@ -43,17 +50,10 @@ def submit_search():
 
     data = sharehold.merge_data(start_json, end_json)
 
-    print(data)
-    
-    return render_template("result.html", DATA=data)
+    print(data[0])
 
-# @app.route("/search")
-# def query():
-#     q = request.args.get('q')
-#     return f"Search query: {q}"
-
-
-
+    return jsonify(data)
+    # return render_template("result.html", heading = headings, data=data) 
 
 if __name__ == '__main__':
     app.run(debug=True)
